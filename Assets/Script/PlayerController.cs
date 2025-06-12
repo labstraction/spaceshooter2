@@ -1,3 +1,4 @@
+using Unity.Mathematics;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -25,19 +26,17 @@ public class PlayerController : MonoBehaviour
 
         Vector2 newPos = new Vector2(horizontalPos, verticalPos);
 
-        transform.Translate(newPos * speed * Time.deltaTime);
+        transform.Translate(newPos * speed * Time.deltaTime, Space.World);
 
-        float boundX = spriteRenderer.bounds.extents.x;
-        float boundY = spriteRenderer.bounds.extents.y;
-
-        float clampX = Mathf.Clamp(transform.position.x, -screenBounds.x + boundX, screenBounds.x - boundX);
-        float clampY = Mathf.Clamp(transform.position.y, -screenBounds.y + boundX, screenBounds.y - boundY);
-
-        transform.position = new Vector2(clampX, clampY);
+        if (horizontalPos != 0 || verticalPos != 0)
+        {
+            float angle = Mathf.Atan2(newPos.x, newPos.y) * Mathf.Rad2Deg;
+            transform.rotation = Quaternion.Euler(0, 0, -angle);
+        }
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            Instantiate(ammo, gun.position, Quaternion.identity);
+            Instantiate(ammo, gun.position, transform.rotation);
         }
     }
 
